@@ -33,6 +33,9 @@ stages:
       - src/model_building.py
       - artifacts/features/tweet_emotions_train_features.csv
       - artifacts/features/tweet_emotions_test_features.csv
+    params:
+      - logreg.max_iter
+      - logreg.C
     outs:
       - artifacts/models/logreg_model.pkl
       - artifacts/metrics/logreg_train_metrics.json
@@ -44,6 +47,10 @@ stages:
       - src/model_evaluation.py
       - artifacts/features/tweet_emotions_train_features.csv
       - artifacts/features/tweet_emotions_test_features.csv
+    params:
+      - gb.n_estimators
+      - gb.learning_rate
+      - gb.max_depth
     outs:
       - artifacts/models/gb_model.pkl
       - artifacts/metrics/gb_train_metrics.json

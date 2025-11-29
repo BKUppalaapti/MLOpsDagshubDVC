@@ -77,8 +77,12 @@ stages:
       size: 167410893
     - path: src/model_building.py
       hash: md5
-      md5: 5720f6005d5345f9de287162793206f7
-      size: 3442
+      md5: 214633bf4ed80ebf318cfbde09603e62
+      size: 4185
+    params:
+      params.yaml:
+        logreg.C: 1.0
+        logreg.max_iter: 200
     outs:
     - path: artifacts/metrics/logreg_eval_metrics.json
       hash: md5
@@ -90,7 +94,7 @@ stages:
       size: 91
     - path: artifacts/models/logreg_model.pkl
       hash: md5
-      md5: 87511d2e1c32149ae4eee85d1994076e
+      md5: 1d1a9011fbeaf17eb0252ccdfa036148
       size: 85903
   model_evaluation:
     cmd: python src/model_evaluation.py
@@ -105,18 +109,23 @@ stages:
       size: 167410893
     - path: src/model_evaluation.py
       hash: md5
-      md5: 28268dc284670f37169a7f1a8aa77db2
-      size: 3240
+      md5: 2aa69dd27e3430dafd3ce3dc6670d968
+      size: 4086
+    params:
+      params.yaml:
+        gb.learning_rate: 0.1
+        gb.max_depth: 3
+        gb.n_estimators: 100
     outs:
     - path: artifacts/metrics/gb_eval_metrics.json
       hash: md5
-      md5: 566a7da77b2590874bb20bb6209cbecc
-      size: 121
+      md5: a29663a21d846a195057a51a636a2c6f
+      size: 120
     - path: artifacts/metrics/gb_train_metrics.json
       hash: md5
-      md5: 530a8e5bcbb2182d80841be36aee54f6
-      size: 120
+      md5: 27697dc12cfd2e260d1613bb74a426c7
+      size: 122
     - path: artifacts/models/gb_model.pkl
       hash: md5
-      md5: 7574f0103c4e5f7e7184bfe00860dc16
-      size: 71889
+      md5: 3531c84d87338c1ae908422ba4eda115
+      size: 136026

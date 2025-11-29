@@ -1,0 +1,7 @@
+[core]
+    remote = dagshub
+['remote "dagshub"']
+    url = https://dagshub.com/krishnauppalapatiaws/MLOpsDagshubDVC.dvc
+    auth = basic
+    user = krishnauppalapatiaws
+    password = 168e9b71744b62e0487ffd1656262c564b7f0952

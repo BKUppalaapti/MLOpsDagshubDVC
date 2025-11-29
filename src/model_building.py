@@ -1,10 +1,31 @@
 import os
 import pandas as pd
 import joblib
+import yaml
 from sklearn.linear_model import LogisticRegression
 from sklearn.metrics import accuracy_score, precision_score, recall_score, roc_auc_score
 import mlflow
 import mlflow.sklearn
+import dagshub
+
+# --- Initialize DagsHub + MLflow ---
+dagshub.init(
+    repo_owner="krishnauppalapatiaws",
+    repo_name="MLOpsDagshubDVC",
+    mlflow=True
+)
+mlflow.set_experiment("tweet_emotions_experiment")
+
+# --- Load parameters from params.yaml ---
+repo_root = os.path.dirname(os.path.dirname(__file__))
+params_path = os.path.join(repo_root, "params.yaml")
+
+with open(params_path) as f:
+    params = yaml.safe_load(f)
+
+logreg_params = params["logreg"]
+MAX_ITER = logreg_params.get("max_iter", 500)
+C = logreg_params.get("C", 1.0)
 
 # --- Train model ---
 def train_model(train_df: pd.DataFrame, test_df: pd.DataFrame):
@@ -14,7 +35,7 @@ def train_model(train_df: pd.DataFrame, test_df: pd.DataFrame):
     X_test = test_df.drop(columns=["sentiment"])
     y_test = test_df["sentiment"]
 
-    model = LogisticRegression(max_iter=500)
+    model = LogisticRegression(max_iter=MAX_ITER, C=C)
     model.fit(X_train, y_train)
 
     # Predictions
@@ -63,14 +84,15 @@ def save_metrics(train_metrics, eval_metrics):
 
     return train_path, eval_path
 
-# --- Log to MLflow ---
-def log_to_mlflow(model, train_metrics, eval_metrics):
-    mlflow.set_experiment("tweet_emotions_experiment")
-    with mlflow.start_run():
-        mlflow.log_params({"model_type": "LogisticRegression", "max_iter": 500})
+# --- Log to MLflow/DagsHub ---
+def log_to_mlflow(model, train_metrics, eval_metrics, train_path, eval_path):
+    with mlflow.start_run(run_name="LogisticRegression"):
+        mlflow.log_params({"model_type": "LogisticRegression", "max_iter": MAX_ITER, "C": C})
         mlflow.log_metrics({f"train_{k}": v for k, v in train_metrics.items()})
         mlflow.log_metrics({f"eval_{k}": v for k, v in eval_metrics.items()})
         mlflow.sklearn.log_model(model, "logreg_model")
+        mlflow.log_artifact(train_path)
+        mlflow.log_artifact(eval_path)
 
 # --- Main ---
 def main():
@@ -85,13 +107,13 @@ def main():
     model, train_metrics, eval_metrics = train_model(train_df, test_df)
 
     # Save model locally
-    save_model_local(model)
+    model_path = save_model_local(model)
 
     # Save metrics locally
-    save_metrics(train_metrics, eval_metrics)
+    train_path, eval_path = save_metrics(train_metrics, eval_metrics)
 
-    # Log to MLflow
-    log_to_mlflow(model, train_metrics, eval_metrics)
+    # Log to MLflow/DagsHub
+    log_to_mlflow(model, train_metrics, eval_metrics, train_path, eval_path)
 
 if __name__ == "__main__":
     main()
