@@ -1,4 +1,25 @@
-# MLOpsDagshubDVC
-# MLOpsDagshubDVC
-# Validating code mirror between github and dagshub
-# Confirm,its working!
+# Build & Track ML Pipelines with DVC
+
+raw → processed → features → model → evaluation → MLflow/DagsHub tracking
+
+
+## How to run?
+
+conda create -n test python=3.11 -y
+
+conda activate test
+
+pip install -r requirements.txt
+
+
+## DVC Commands
+
+git init
+
+dvc init
+
+dvc repro
+
+dvc dag
+
+dvc metrics show
